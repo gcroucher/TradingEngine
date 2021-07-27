@@ -1,14 +1,19 @@
-from src.datatypes import Order, OrderBook, OrderStatus
-from flask import Flask, request
+from tradingengine.src.datatypes import Order, OrderBook, OrderStatus
+from flask import Flask, request, Blueprint
 from flask_restful import Api, Resource, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
 
+# To run in bash from cmdline
+# from parent dir, set FLASK_APP=src/main
+# then flask run
+
+main = Blueprint('main', __name__)
 
 def create_app():
-    app = Flask(__name__)
-    api = Api(app)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-    db = SQLAlchemy(app)
+    #app = Flask(__name__)
+    #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+    #db = SQLAlchemy(app)
+
     
     feedcode = "NK225"
     order_book = OrderBook(feedcode)
@@ -81,9 +86,9 @@ def create_app():
     def show_orderbook(instrument):
         return {"order_book": order_book.to_json()}
 
-    return app
+    return app, db
 
 if __name__ == "__main__":
     print("TESTING THIS MAIN CALL")
-    app = create_app()
+    app, db = create_app()
     app.run(debug=True)
