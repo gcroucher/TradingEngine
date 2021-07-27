@@ -34,12 +34,12 @@ def create_app(config_class=Config):
     #app.register_blueprint(errors)
 
     feedcode = "NK225"
-    order_book = OrderBook(feedcode)
+    app.order_book = OrderBook(feedcode)
     # Load some Test data
-    order_id = order_book.insert_order(Order("NK225", True, 5, 50, "gracro"))
-    order_id = order_book.insert_order(Order("NK225", True, 5, 50, "gracro"))
-    order_id = order_book.insert_order(Order("NK225", False, 5, 60, "gracro"))
-    print(order_book.render())
+    order_id = app.order_book.insert_order(Order("NK225", True, 5, 50, "gracro"))
+    order_id = app.order_book.insert_order(Order("NK225", True, 5, 50, "gracro"))
+    order_id = app.order_book.insert_order(Order("NK225", False, 5, 60, "gracro"))
+    print(app.order_book.render())
 
     @app.route('/hello')
     def hello():
