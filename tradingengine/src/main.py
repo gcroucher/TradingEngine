@@ -1,7 +1,6 @@
-from tradingengine.src.datatypes import Order, OrderBook, OrderStatus
-from flask import Flask, request, Blueprint, current_app
-from flask_restful import Api, Resource, reqparse, abort
-from flask_sqlalchemy import SQLAlchemy
+from tradingengine.src.datatypes import Order
+from flask import Blueprint, current_app
+from flask_restful import reqparse
 
 # To run in bash from cmdline
 # from parent dir, set FLASK_APP=src/main

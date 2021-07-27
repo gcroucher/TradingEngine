@@ -1,4 +1,4 @@
-from src.main import create_app
+from tradingengine import create_app
 import pytest
 
 @pytest.fixture
@@ -28,8 +28,6 @@ def test_trade(client):
                     'sitting_order': {'instrument': 'NK225', 'isbid': False, 'order_id': 4, 'order_status': 1, 'price': 55, 'username': 'fred', 'volume': 6}, 
                     'trade_id': 1, 'traded_price': 55, 'traded_volume': 5}]
     assert response.status_code == 200
-
-
 
 def test_delete(client):
     response = client.post('/deleteorder', data=dict(instrument="NK225", order_id=2))

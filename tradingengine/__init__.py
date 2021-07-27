@@ -6,8 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 #from flask_mail import Mail
 from tradingengine.config import Config
 
-print("TESTING0")
-
 db = SQLAlchemy()
 #bcrypt = Bcrypt()
 #login_manager = LoginManager()
