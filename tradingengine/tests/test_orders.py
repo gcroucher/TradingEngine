@@ -1,4 +1,4 @@
-from src.datatypes import Order, OrderBook, Trade, OrderStatus    # The code to test
+from tradingengine.src.datatypes import Order, OrderBook, Trade, OrderStatus    # The code to test
 import json
 
 def test_create_order():
