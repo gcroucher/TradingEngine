@@ -29,10 +29,10 @@ def insert_order():
 def get_order(order_id):
     return {"order_details": current_app.order_book.get_order(order_id)}
 
+
 order_delete_args = reqparse.RequestParser()
 order_delete_args.add_argument("instrument", type=str, help="Feedcode of the instrument is required", required=True)
 order_delete_args.add_argument("order_id", type=int, help="order_id is required", required=True)
-
 
 @main.route('/deleteorder', methods=['POST'])
 def delete_order():
@@ -66,3 +66,9 @@ def amend_order():
 @main.route('/orderbook/<string:instrument>', methods=['GET'])
 def show_orderbook(instrument):
     return {"order_book": current_app.order_book.to_json()}
+
+@main.route('/toplevel/<string:instrument>', methods=['GET'])
+def show_toplevel(instrument):
+    reply_tuple = current_app.order_book.reply_top_level()
+    #return {"bid": f"{reply_tuple[1]}@{reply_tuple[0]}", "ask": f"{reply_tuple[3]}@{reply_tuple[2]}"}
+    return {"bid": reply_tuple[0], "bid_volume": reply_tuple[1], "ask": reply_tuple[2], "ask_volume": reply_tuple[3]}

@@ -72,7 +72,6 @@ class OrderBook:
         self.tick_levels[order['price']].append(order)
         self.order_dict[order['order_id']] = order
         order['order_status'] = OrderStatus.ACTIVE.value #AMENDED
-        print(order['order_status'])
 
     def get_order(self, order_id):
         return self.order_dict[order_id]
@@ -97,7 +96,6 @@ class OrderBook:
         order, trade_list = self.insert_order(order)
         order['order_status'] = OrderStatus.AMENDED.value
         return order, trade_list
-
 
     def delete_order(self, order_id):
         #TODO Find and remove from tick_levels!
@@ -140,12 +138,39 @@ class OrderBook:
         #clear empty order from book
         if sit_order['volume'] == 0: 
             print(f"clearing the sitting order from book: {sit_order}")
-            sit_order['order_status'] = 2
+            sit_order['order_status'] = OrderStatus.COMPLETED.value
             self.tick_levels[price].popleft() 
 
         #TODO - handle the sitting order update / push to user
-        #TODO - order statuses
         return new_trade
+
+    def refresh_top_level(self):
+        """ call this method when unsure that the top level prices are still correct, and it will update them
+            Typically caused by trade-outs or amends or deletes
+            We assume the self.min_ask and self.max_bid are the 'best case' and we only need to hunt backwards.
+        """
+        while not self.tick_levels[self.min_ask] and self.min_ask < self.max_price:  #i.e. there are no orders on that level
+            self.min_ask += self.tick_size
+        
+        while not self.tick_levels[self.max_bid] and self.max_bid < self.min_price:  #i.e. there are no orders on that level
+            self.max_bid -= self.tick_size
+
+    def reply_top_level(self):
+        """Returns the top level prices and total volume on that level"""
+        self.refresh_top_level()
+        bid_vol = ask_vol = 0
+        # if one side doesnt exit, the top-level will be the max_price or min_price
+        # and the vol will be 0. This makes this function 'work' fine.
+        for bid_order in self.tick_levels[self.max_bid]:
+            bid_vol += bid_order['volume']
+        for ask_order in self.tick_levels[self.min_ask]:
+            ask_vol += ask_order['volume']
+        return (self.max_bid, bid_vol, self.min_ask, ask_vol)
+
+    def reply_full_book(self):
+        print("We are in reply_full_order_book, what do we return?")
+        print(f"{self.to_json()}")
+        return self.to_json()
 
     def insert_order(self, order):
         """ Inserts the passed order object into the order book"""
@@ -177,7 +202,10 @@ class OrderBook:
                 self.add_order_to_books(order)
                 if self.max_bid < order['price']:
                     self.max_bid = order['price']
-            
+            # Otherwise, its a completed order 
+            else: 
+                order['order_status'] = OrderStatus.COMPLETED.value
+
             return order, curr_trade_list
 
         else: # It's an Ask!
@@ -197,7 +225,10 @@ class OrderBook:
                 self.add_order_to_books(order)
                 if self.min_ask > order['price']:
                     self.min_ask = order['price']
-            
+            # Otherwise, its a completed order 
+            else: 
+                order['order_status'] = OrderStatus.COMPLETED.value
+
             return order, curr_trade_list
 
     def to_json(self):
@@ -249,6 +280,3 @@ class OrderBook:
                 output.write("\r\n"+("-"*110)+"\r\n")
         return output.getvalue()
 
-#TODO this needs to work for passing orderbook objects back to clients
-#   def __getitem__():
-#       return self
